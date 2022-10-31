@@ -114,7 +114,7 @@ export default {
           url: '/subPages/unpackingRecords/unpackingRecords'
         },
         {
-          image: 'https://static.gute.fun/static/luckyOwn/yue@2x.png',
+          image: 'https://static.gute.fun/static/luckyOwn/me/yue@2x.png',
           name: '我的余额',
           url: '/subPages/myBalance/myBalance'
         },

@@ -47,6 +47,9 @@
         </template>
       </swiper>
     </view>
+
+    <payment ref="payment" :box-id="currBox && currBox.box_id" :box-num="boxNum" :type="type" pay-page="index"
+             @create-success="closeNumPopup" @show-result="showResult"></payment>
   </view>
 </template>
 
