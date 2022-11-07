@@ -1,7 +1,7 @@
 <template>
   <view class="order">
     <view class="order_head flex">
-      <view class="order_head_li center" @click="changeIndex(index)" :class="{active:index == i}" v-for="(item,index) in 3" :key="index">{{ index == 0 ? '待发货' : index == 1 ? '已发货' :'已完成' }}</view>
+      <view class="order_head_li center" @click="changeIndex(index)" :class="{active:index == i}" v-for="(item,index) in 2" :key="index">{{ index == 0 ? '已申请' : '已发货' }}</view>
     </view>
     <view class="order_ul">
       <view class="order_li" v-for="(item,index) in orderList" :key="index" @click="goOrderMessage(item)">

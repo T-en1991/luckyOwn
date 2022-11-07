@@ -1,22 +1,39 @@
 <template>
   <view class="home">
     <view class="head">
-      <view v-for="(item,index) in categoryList" :key="index" :class="['head_block',naved===index?'naved':'']"
-            @click="chooseNav(index)">
-        {{ item.categoryName }}
+      <!--      <view v-for="(item,index) in categoryList" :key="index" :class="['head_block',naved===index?'naved':'']"-->
+      <!--            @click="chooseNav(index)">-->
+      <!--        {{ item.categoryName }}-->
+      <!--      </view>-->
+      <view :class="['head_block']" @click="chooseNav(0)">
+        <text :class="[isAnimate?'showAnimate':'fadeAnimate']">
+          {{ categoryList[0].categoryName }}
+        </text>
       </view>
+      <view :class="['naved']" @click="chooseNav(1)">
+        <text :class="[isAnimate?'showAnimate':'fadeAnimate']">
+          {{ categoryList[1].categoryName }}
+        </text>
+      </view>
+      <view :class="['head_block']" @click="chooseNav(2)">
+        <text :class="[isAnimate?'showAnimate':'fadeAnimate']">
+          {{ categoryList[2].categoryName }}
+        </text>
+      </view>
+
     </view>
     <view class="content">
       <view class="title">
         <view class="borderIcon"></view>
-        <view class="titleTxt">{{ categoryList.length > 0? categoryList[naved].desc : '欢乐抽赏'}}</view>
+        <view class="titleTxt">{{ categoryList.length > 0 ? categoryList[1].desc : '欢乐抽赏' }}</view>
       </view>
       <view class="swiperContent" v-if="goodsList.length>0">
-        <swiper circular :current="isActivedGroup" @change="changeCircle">
-          <template v-for="item in goodsList[naved].data">
+        <swiper circular :current="isActivedGroup" @change="changeCircle" @transition="transition">
+          <template v-for="(item,idx) in goodsList[1].data">
             <swiper-item>
-              <view class="circle">
-                <image class="qiu" v-for="(cur,index) in item.imgArr" :class="[flag?'btn':'',qiu[index]]" :key="index"
+              <view class="circle" @click="toDetail(item)" :key="idx">
+                <image class="qiu" v-for="(cur,index) in item.imgArr"
+                       :class="[flag?'btn':'',qiu[index],huangdong&&!flag?hd[index]:'']" :key="index"
                        :src=cur></image>
               </view>
               <view class="draw" @click="btn">
@@ -37,7 +54,7 @@
     <view class="footer" v-if="goodsList.length>0">
       <swiper circular previous-margin="200rpx" next-margin="200rpx" :current="isActivedGroup"
               @change="chooseGroup($event.detail.current)">
-        <template v-for="(item,index) in goodsList[naved].data">
+        <template v-for="(item,index) in goodsList[1].data">
           <swiper-item>
             <view :key="index" class="swiperBlock" @click="chooseGroup(index)">
               <image :class="isActivedGroup===index?'isActivedGroup':''" :src=item.img mode="scaleToFill"></image>
@@ -48,37 +65,139 @@
       </swiper>
     </view>
 
-    <payment ref="payment" :box-id="currBox && currBox.box_id" :box-num="boxNum" :type="type" pay-page="index"
-             @create-success="closeNumPopup" @show-result="showResult"></payment>
+
+    <uni-popup ref="num-popup" type="bottom" :mask-click="false">
+      <view class="num-popup">
+        <view class="popup-close" @click="closeNumPopup">
+          <image src="https://static.gute.fun/static/luckyOwn/home/guanbi@2x.png" mode=""></image>
+        </view>
+        <view class="num-button-group">
+          <view class="num-button" @click="createOder(1)">
+            <image src="https://static.gute.fun/static/luckyOwn/new_home/btn-1.png" mode="widthFix"></image>
+            <text>一发入魂</text>
+          </view>
+        </view>
+        <view class="num-button-group">
+          <view class="num-button" @click="createOder(5)">
+            <image src="https://static.gute.fun/static/luckyOwn/new_home/btn-3.png" mode="widthFix"></image>
+            <text>五连绝世</text>
+          </view>
+          <view class="num-button" @click="createOder(9)">
+            <image src="https://static.gute.fun/static/luckyOwn/new_home/btn-2.png" mode="widthFix"></image>
+            <text>九连更稳</text>
+          </view>
+        </view>
+        <view class="order-info">
+          <view>
+            开盒数量：{{ boxNum }}
+          </view>
+          <view class="total-price">
+            订单金额：￥{{ totalPrice || 29 }}
+          </view>
+        </view>
+        <view class="popup-btn">
+          <!-- <button type="primary" @click="$refs['payment'].open(0, boxNum)">创建订单</button> -->
+        </view>
+      </view>
+    </uni-popup>
+
+    <uni-popup ref="order-popup" type="center" :mask-click="false" background-color="#fff">
+      <view class="orderPopupView">
+        <view class="title">
+         购买大疆无人机合集
+        </view>
+        <view class="payType">
+          <view>
+            支付方式：
+          </view>
+          <view>
+            <radio-group>
+              <label class="radio"><radio value="r1" checked="true" />刀币</label>
+              <label class="radio"><radio value="r2" />微信</label>
+            </radio-group>
+          </view>
+        </view>
+        <view class="payBtn">
+          <button style="padding: 0 40rpx;" size="mini" type="default" plain="true" @click="cancel">取消</button>
+          <button style="padding: 0 40rpx;" size="mini" type="primary" plain="true" @click="confirm">确定</button>
+        </view>
+      </view>
+    </uni-popup>
+
+    <uni-popup ref="get-popup" type="center" :mask-click="false" background-color="#fff">
+      恭喜获得。。。
+    </uni-popup>
+
+<!--    <show-result :key="resultKey" ref="result-popup" :num="boxNum" :type="type" @close="resultKey++"></show-result>-->
+
   </view>
 </template>
 
 <script>
+// import showResult from '../../components/show-result'
 export default {
   data() {
     return {
       goodsList: [],
       categoryList: [],//大类
       flag: false,//球是否应该运动
+      huangdong: false,//球是否可以晃动
       qiu: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'],//球对应动态样式的名称
+      hd: ['hd1', 'hd2', 'hd3', 'hd4', 'hd5', 'hd6', 'hd7', 'hd8', 'hd9', 'hd10', 'hd11', 'hd12'],//球对应动态样式的名称
       titleTxt: ['最新上架', '欢乐无限赏', '积分无限赏'],
       naved: 1,//三种方式
+      isAnimate: true,//大类是否动画
       isActivedGroup: 0,//选中的组
+      type: 0,
+      list: [{
+        "box_id": 42,
+        "box_name": "电玩数码",
+        "coin_price": 25,
+        "box_banner_images": "http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/d50948ff96a0eddb5c8d22e9f82b6428.jpg,http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/ecd4f842e5b42025a64142423f63b7a8.jpg",
+        "box_foot_images": "http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/63b52880b317b61c5bf8a717797d5c7e.jpg",
+        "goods_num": 8,
+        "price_min": 39,
+        "price_max": 7499,
+        "goods_images": ["http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/de7cbb4308fd4674ad331c0383f7c3d2.jpg", "http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/1f9046b2a9deb2af103d29c953a2922a.jpg", "http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/86782bdd45d38e22a51274a319910890.jpg", "http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/2ac38f5f38a71c64ef1a440416653c8f.jpg", "http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/e1959c9898c76fbb54fa1c5abd4d6ea8.jpg", "http:\/\/bab668.oss-cn-shanghai.aliyuncs.com\/c6ab5864570637a2772f421b1ce60c5f.jpg"]
+      }],
+      resultKey: 0,
+      boxNum: 1,
     }
-  },
-  onLoad() {
-
   },
   created() {
     this.getGoodsList()
     this.getCategoryList()
   },
+  components: {
+    // showResult
+  },
   methods: {
+    //创建订单
+    createOder(num) {
+      this.boxNum = num
+      this.closeNumPopup()
+      this.$refs['order-popup'].open('center')
+    },
+    //点击抽取
     btn() {
-      this.flag = true;
+      // this.flag = true;
+      this.type = 0
+      this.boxNum = 1
+      this.$refs['num-popup'].open()
       setTimeout(() => {
-        this.flag = false;
+        // this.flag = false;
       }, 1500)
+    },
+    //确定购买
+    confirm(){
+      this.$refs['order-popup'].close()
+      this.$refs['get-popup'].open()
+      setTimeout(()=>{
+        this.$refs['get-popup'].close()
+      },500)
+    },
+    cancel(){
+      this.$refs['order-popup'].close()
     },
     chooseGroup(index) {
       this.isActivedGroup = index;
@@ -86,9 +205,52 @@ export default {
     changeCircle(e) {
       this.isActivedGroup = e.detail.current
     },
+    //创建订单成功或者试玩返回结果
+    closeNumPopup() {
+      //关闭数量弹窗
+      this.$refs['num-popup'].close()
+    },
+    //跳转盒柜
+    toMyBox() {
+      this.$refs['result-popup'].close()
+      uni.navigateTo({url: '/pages/me/myBox'})
+    },
+    //回收
+    recycle(prizedata) {
+      this.$refs['result-popup'].close()
+      this.$refs['recycle'].recycle(prizedata.prizeInfo)
+    },
     chooseNav(index) {
-      this.naved = index;
+      this.naved = this.categoryList[index].categoryId;
+      if (index === 1) return
+      this.isAnimate = false;
+      setTimeout(() => {
+        this.isAnimate = true;
+        let m = this.categoryList[1];
+        this.categoryList[1] = this.categoryList[index];
+        this.categoryList[index] = m;
+
+        let n = this.goodsList[1];
+        this.goodsList[1] = this.goodsList[index];
+        this.goodsList[index] = n;
+      }, 1000)
       this.isActivedGroup = 0;
+    },
+    //前往详情页
+    toDetail(item) {
+      console.log(item)
+      uni.navigateTo({
+        url: `/subPages/goodsDetail/goodsDetail?id=${item.id}`
+      })
+    },
+
+    //swiper变化时的回调
+    transition(e) {
+      if (this.huangdong) return
+      this.huangdong = true
+      setTimeout(() => {
+        this.huangdong = false
+      }, 1000)
     },
     //获取大类
     getCategoryList() {
@@ -287,6 +449,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "keyframe.scss";
+
 .home {
   overflow: hidden;
   width: 100vw;
@@ -304,9 +468,12 @@ export default {
       width: 20%;
       height: 80rpx;
       line-height: 80rpx;
-      color: brown;
-      font-size: 28rpx;
       background: url("https://static.gute.fun/static/luckyOwn/lucky/nav.png") no-repeat center/cover;
+
+      text {
+        color: brown;
+        font-size: 28rpx;
+      }
     }
 
     .head_mid {
@@ -331,10 +498,22 @@ export default {
       width: 30%;
       height: 200rpx;
       line-height: 280rpx;
-      font-size: 36rpx;
-      color: #fff;
       background: url("https://static.gute.fun/static/luckyOwn/lucky/naved.png") no-repeat center/cover;
+
+      text {
+        color: #fff;
+        font-size: 36rpx;
+      }
     }
+
+    .fadeAnimate {
+      animation: fade 1s 1;
+    }
+
+    .showAnimate {
+      animation: show 1s 1;
+    }
+
   }
 
   .content {
@@ -374,7 +553,8 @@ export default {
       uni-swiper {
         height: 800rpx;
       }
-      swiper{
+
+      swiper {
         height: 800rpx;
       }
 
@@ -397,65 +577,136 @@ export default {
           transform: rotate(0deg);
 
           &.one {
-            top: 310rpx;
-            left: 160rpx;
-          }
-
-          &.two {
-            top: 260rpx;
-            left: 220rpx;
-          }
-
-          &.three {
-            top: 280rpx;
-            left: 280rpx;
-          }
-
-          &.four {
-            top: 300rpx;
-            left: 340rpx;
-          }
-
-          &.five {
-            top: 320rpx;
-            left: 260rpx;
-          }
-
-          &.six {
-            top: 200rpx;
-            left: 400rpx;
-          }
-
-          &.seven {
-            top: 180rpx;
+            top: 370rpx;
             left: 200rpx;
           }
 
+          &.two {
+            top: 370rpx;
+            left: 200rpx;
+          }
+
+          &.three {
+            top: 370rpx;
+            left: 200rpx;
+          }
+
+          &.four {
+            top: 370rpx;
+            left: 200rpx;
+          }
+
+          &.five {
+            top: 370rpx;
+            left: 200rpx;
+          }
+
+          &.six {
+            top: 370rpx;
+            left: 200rpx;
+          }
+
+          &.seven {
+            top: 372rpx;
+            left: 338rpx;
+          }
+
           &.eight {
-            top: 200rpx;
-            left: 300rpx;
+            top: 372rpx;
+            left: 338rpx;
           }
 
           &.nine {
-            top: 220rpx;
-            left: 160rpx;
+            top: 372rpx;
+            left: 338rpx;
           }
 
           &.ten {
-            top: 230rpx;
-            left: 230rpx;
+            top: 372rpx;
+            left: 338rpx;
           }
 
           &.eleven {
-            top: 270rpx;
-            left: 400rpx;
+            top: 372rpx;
+            left: 338rpx;
           }
 
           &.twelve {
-            top: 360rpx;
-            left: 340rpx;
+            top: 372rpx;
+            left: 338rpx;
           }
 
+          &.hd1 {
+            animation-duration: 1s;
+            animation-name: hd1;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd2 {
+            animation-duration: 1s;
+            animation-name: hd2;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd3 {
+            animation-duration: 1s;
+            animation-name: hd3;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd4 {
+            animation-duration: 1s;
+            animation-name: hd4;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd5 {
+            animation-duration: 1s;
+            animation-name: hd5;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd6 {
+            animation-duration: 1s;
+            animation-name: hd6;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd7 {
+            animation-duration: 1s;
+            animation-name: hd7;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd8 {
+            animation-duration: 1s;
+            animation-name: hd8;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd9 {
+            animation-duration: 1s;
+            animation-name: hd9;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd10 {
+            animation-duration: 1s;
+            animation-name: hd10;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd11 {
+            animation-duration: 1s;
+            animation-name: hd11;
+            animation-timing-function: ease-out;
+          }
+
+          &.hd12 {
+            animation-duration: 1s;
+            animation-name: hd12;
+            animation-timing-function: ease-out;
+          }
 
           &.btn.one {
             animation-name: around1;
@@ -526,7 +777,7 @@ export default {
         right: -180rpx;
         display: flex;
         align-items: center;
-        animation: shouAnimation 2000ms linear forwards infinite;
+        animation: shouAnimation 1000ms linear forwards infinite;
 
         image {
           width: 100rpx;
@@ -589,646 +840,82 @@ export default {
       }
     }
   }
-}
+  //选择数量弹窗
+  .num-popup {
+    background: #FFFFFF;
+    border-radius: 10px 10px 0px 0px;
+    padding: 50px 25px 90px 25px;
 
-@keyframes around1 {
-  10% {
-    top: 310rpx;
-    left: 120rpx;
-    transform: rotate(-40deg);
-  }
-  20% {
-    top: 110rpx;
-    left: 160rpx;
-    transform: rotate(-30deg);
-  }
-  30% {
-    top: 222rpx;
-    left: 260rpx;
-    transform: rotate(-30deg);
-  }
-  40% {
-    top: 210rpx;
-    left: 260rpx;
-    transform: rotate(60deg);
-  }
-  50% {
-    top: 320rpx;
-    left: 270rpx;
-    transform: rotate(80deg);
-  }
-  60% {
-    top: 310rpx;
-    left: 360rpx;
-    transform: rotate(90deg);
-  }
-  70% {
-    top: 340rpx;
-    left: 340rpx;
-    transform: rotate(290deg);
-  }
-  80% {
-    top: 120rpx;
-    left: 260rpx;
-    transform: rotate(-60deg);
-  }
-  80% {
-    top: 192rpx;
-    left: 272rpx;
-    transform: rotate(-50deg);
-  }
-  100% {
-    top: 310rpx;
-    left: 160rpx;
-    transform: rotate(0deg);
-  }
-}
+    .popup-close {
+      top: 30rpx;
+      right: 30rpx;
+      width: 44rpx;
+      height: 44rpx;
+      position: absolute;
+    }
 
-@keyframes around2 {
-  10% {
-    top: 323rpx;
-    left: 332rpx;
-    transform: rotate(10deg);
+    .num-button-group {
+      display: flex;
+      justify-content: center;
+      gap: 50rpx;
+    }
+
+    .num-button {
+      position: relative;
+      width: 300rpx;
+
+      text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        font-size: 36rpx;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 1px 1px 1px black;
+      }
+    }
+
+    .order-info {
+      display: flex;
+
+      > view {
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+
+      > view {
+        font-size: 28rpx;
+        font-weight: bold;
+      }
+
+      .total-price {
+        color: red;
+      }
+    }
+
+    > view {
+      margin-bottom: 30rpx;
+    }
   }
-  20% {
-    top: 342rpx;
-    left: 123rpx;
-    transform: rotate(-20deg);
-  }
-  30% {
-    top: 323rpx;
-    left: 211rpx;
-    transform: rotate(-80deg);
-  }
-  40% {
-    top: 239rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  50% {
-    top: 323rpx;
-    left: 332rpx;
-    transform: rotate(10deg);
-  }
-  60% {
-    top: 342rpx;
-    left: 123rpx;
-    transform: rotate(-20deg);
-  }
-  70% {
-    top: 323rpx;
-    left: 211rpx;
-    transform: rotate(-80deg);
-  }
-  80% {
-    top: 239rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  90% {
-    top: 342rpx;
-    left: 123rpx;
-    transform: rotate(-20deg);
-  }
-  100% {
-    top: 260rpx;
-    left: 220rpx;
-    transform: rotate(0deg);
+
+  .orderPopupView {
+    padding: 20rpx;
+    width: 80vw;
+    text-align: center;
+    .payType{
+      display: flex;
+      margin: 60rpx 0;
+    }
+    .payBtn{
+      display: flex;
+      margin: 20rpx 0;
+      justify-content: space-evenly;
+      align-items: center;
+    }
   }
 }
 
-@keyframes around3 {
-  10% {
-    top: 342rpx;
-    left: 123rpx;
-    transform: rotate(-20deg);
-  }
-  20% {
-    top: 323rpx;
-    left: 211rpx;
-    transform: rotate(-80deg);
-  }
-  30% {
-    top: 239rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  40% {
-    top: 300rpx;
-    left: 200rpx;
-    transform: rotate(30deg);
-  }
-  50% {
-    top: 337rpx;
-    left: 210rpx;
-    transform: rotate(-60deg);
-  }
-  60% {
-    top: 298rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  70% {
-    top: 323rpx;
-    left: 332rpx;
-    transform: rotate(10deg);
-  }
-  80% {
-    top: 342rpx;
-    left: 123rpx;
-    transform: rotate(-20deg);
-  }
-  90% {
-    top: 230rpx;
-    left: 365rpx;
-    transform: rotate(40deg);
-  }
-  100% {
-    top: 280rpx;
-    left: 280rpx;
-    transform: rotate(0deg);
-  }
-}
 
-@keyframes around4 {
-  10% {
-    top: 342rpx;
-    left: 123rpx;
-    transform: rotate(-20deg);
-  }
-  20% {
-    top: 230rpx;
-    left: 365rpx;
-    transform: rotate(40deg);
-  }
-  30% {
-    top: 280rpx;
-    left: 280rpx;
-    transform: rotate(0deg);
-  }
-  40% {
-    top: 320rpx;
-    left: 190rpx;
-    transform: rotate(-10deg);
-  }
-  50% {
-    top: 190rpx;
-    left: 230rpx;
-    transform: rotate(10deg);
-  }
-  60% {
-    top: 230rpx;
-    left: 178rpx;
-    transform: rotate(30deg);
-  }
-  70% {
-    top: 320rpx;
-    left: 190rpx;
-    transform: rotate(-10deg);
-  }
-  80% {
-    top: 190rpx;
-    left: 230rpx;
-    transform: rotate(10deg);
-  }
-  90% {
-    top: 287rpx;
-    left: 376rpx;
-    transform: rotate(90deg);
-  }
-  100% {
-    top: 300rpx;
-    left: 340rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around5 {
-  10% {
-    top: 110rpx;
-    left: 160rpx;
-    transform: rotate(-10deg);
-  }
-  20% {
-    top: 239rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  30% {
-    top: 300rpx;
-    left: 200rpx;
-    transform: rotate(30deg);
-  }
-  40% {
-    top: 337rpx;
-    left: 210rpx;
-    transform: rotate(-60deg);
-  }
-  50% {
-    top: 298rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  60% {
-    top: 210rpx;
-    left: 260rpx;
-    transform: rotate(-30deg);
-  }
-  70% {
-    top: 342rpx;
-    left: 302rpx;
-    transform: rotate(-110deg);
-  }
-  80% {
-    top: 335rpx;
-    left: 367rpx;
-    transform: rotate(30deg);
-  }
-  90% {
-    top: 337rpx;
-    left: 210rpx;
-    transform: rotate(-60deg);
-  }
-  100% {
-    top: 320rpx;
-    left: 260rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around6 {
-  10% {
-    top: 342rpx;
-    left: 302rpx;
-    transform: rotate(-110deg);
-  }
-  20% {
-    top: 335rpx;
-    left: 367rpx;
-    transform: rotate(30deg);
-  }
-  30% {
-    top: 337rpx;
-    left: 210rpx;
-    transform: rotate(-60deg);
-  }
-  40% {
-    top: 320rpx;
-    left: 260rpx;
-    transform: rotate(0deg);
-  }
-  50% {
-    top: 128rpx;
-    left: 354rpx;
-    transform: rotate(-20deg);
-  }
-
-  60% {
-    top: 236rpx;
-    left: 222rpx;
-    transform: rotate(30deg);
-  }
-
-  70% {
-    top: 333rpx;
-    left: 323rpx;
-    transform: rotate(50deg);
-  }
-
-  80% {
-    top: 233rpx;
-    left: 233rpx;
-    transform: rotate(10deg);
-  }
-
-  90% {
-    top: 333rpx;
-    left: 323rpx;
-    transform: rotate(50deg);
-  }
-
-  100% {
-    top: 200rpx;
-    left: 400rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around7 {
-  10% {
-    top: 300rpx;
-    left: 200rpx;
-    transform: rotate(30deg);
-  }
-  20% {
-    top: 300rpx;
-    left: 200rpx;
-    transform: rotate(30deg);
-  }
-  30% {
-    top: 210rpx;
-    left: 222rpx;
-    transform: rotate(-30deg);
-  }
-  40% {
-    top: 310rpx;
-    left: 232rpx;
-    transform: rotate(60deg);
-  }
-  50% {
-    top: 321rpx;
-    left: 260rpx;
-    transform: rotate(90deg);
-  }
-  60% {
-    top: 110rpx;
-    left: 160rpx;
-    transform: rotate(-10deg);
-  }
-  70% {
-    top: 239rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  80% {
-    top: 220rpx;
-    left: 160rpx;
-    transform: rotate(-60deg);
-  }
-  90% {
-    top: 298rpx;
-    left: 203rpx;
-    transform: rotate(20deg);
-  }
-  100% {
-    top: 180rpx;
-    left: 200rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around8 {
-  10% {
-    top: 351rpx;
-    left: 270rpx;
-    transform: rotate(90deg);
-  }
-  20% {
-    top: 312rpx;
-    left: 350rpx;
-    transform: rotate(-60deg);
-  }
-  30% {
-    top: 200rpx;
-    left: 300rpx;
-    transform: rotate(0deg);
-  }
-  40% {
-    top: 190rpx;
-    left: 322rpx;
-    transform: rotate(-30deg);
-  }
-  50% {
-    top: 330rpx;
-    left: 232rpx;
-    transform: rotate(60deg);
-  }
-  60% {
-    top: 351rpx;
-    left: 270rpx;
-    transform: rotate(90deg);
-  }
-  70% {
-    top: 312rpx;
-    left: 350rpx;
-    transform: rotate(-60deg);
-  }
-  80% {
-    top: 200rpx;
-    left: 300rpx;
-    transform: rotate(0deg);
-  }
-  90% {
-    top: 190rpx;
-    left: 322rpx;
-    transform: rotate(-30deg);
-  }
-  100% {
-    top: 200rpx;
-    left: 300rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around9 {
-  10% {
-    top: 290rpx;
-    left: 342rpx;
-    transform: rotate(-30deg);
-  }
-  20% {
-    top: 351rpx;
-    left: 239rpx;
-    transform: rotate(90deg);
-  }
-  30% {
-    top: 292rpx;
-    left: 190rpx;
-    transform: rotate(-60deg);
-  }
-  40% {
-    top: 220rpx;
-    left: 160rpx;
-    transform: rotate(0deg);
-  }
-  50% {
-    top: 357rpx;
-    left: 203rpx;
-    transform: rotate(60deg);
-  }
-  60% {
-    top: 351rpx;
-    left: 239rpx;
-    transform: rotate(90deg);
-  }
-  70% {
-    top: 292rpx;
-    left: 190rpx;
-    transform: rotate(-60deg);
-  }
-  80% {
-    top: 351rpx;
-    left: 270rpx;
-    transform: rotate(90deg);
-  }
-  90% {
-    top: 312rpx;
-    left: 350rpx;
-    transform: rotate(-60deg);
-  }
-  100% {
-    top: 220rpx;
-    left: 160rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around10 {
-  10% {
-    top: 326rpx;
-    left: 332rpx;
-    transform: rotate(-30deg);
-  }
-  20% {
-    top: 200rpx;
-    left: 300rpx;
-    transform: rotate(0deg);
-  }
-  30% {
-    top: 291rpx;
-    left: 339rpx;
-    transform: rotate(90deg);
-  }
-  40% {
-    top: 353rpx;
-    left: 231rpx;
-    transform: rotate(60deg);
-  }
-  50% {
-    top: 291rpx;
-    left: 339rpx;
-    transform: rotate(90deg);
-  }
-  60% {
-    top: 342rpx;
-    left: 168rpx;
-    transform: rotate(-60deg);
-  }
-  70% {
-    top: 200rpx;
-    left: 300rpx;
-    transform: rotate(0deg);
-  }
-  80% {
-    top: 190rpx;
-    left: 322rpx;
-    transform: rotate(-30deg);
-  }
-  90% {
-    top: 200rpx;
-    left: 300rpx;
-    transform: rotate(0deg);
-  }
-  100% {
-    top: 230rpx;
-    left: 230rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around11 {
-  10% {
-    top: 362rpx;
-    left: 323rpx;
-    transform: rotate(-30deg);
-  }
-  20% {
-    top: 326rpx;
-    left: 332rpx;
-    transform: rotate(-30deg);
-  }
-  30% {
-    top: 200rpx;
-    left: 300rpx;
-    transform: rotate(0deg);
-  }
-  40% {
-    top: 291rpx;
-    left: 339rpx;
-    transform: rotate(90deg);
-  }
-  50% {
-    top: 353rpx;
-    left: 231rpx;
-    transform: rotate(60deg);
-  }
-  60% {
-    top: 291rpx;
-    left: 339rpx;
-    transform: rotate(90deg);
-  }
-  70% {
-    top: 336rpx;
-    left: 321rpx;
-    transform: rotate(60deg);
-  }
-  80% {
-    top: 351rpx;
-    left: 393rpx;
-    transform: rotate(90deg);
-  }
-  90% {
-    top: 327rpx;
-    left: 268rpx;
-    transform: rotate(-60deg);
-  }
-  100% {
-    top: 270rpx;
-    left: 400rpx;
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes around12 {
-  10% {
-    top: 265rpx;
-    left: 325rpx;
-    transform: rotate(-30deg);
-  }
-  20% {
-    top: 291rpx;
-    left: 339rpx;
-    transform: rotate(90deg);
-  }
-  30% {
-    top: 353rpx;
-    left: 231rpx;
-    transform: rotate(60deg);
-  }
-  40% {
-    top: 291rpx;
-    left: 339rpx;
-    transform: rotate(90deg);
-  }
-  50% {
-    top: 365rpx;
-    left: 325rpx;
-    transform: rotate(60deg);
-  }
-  60% {
-    top: 350rpx;
-    left: 334rpx;
-    transform: rotate(90deg);
-  }
-  70% {
-    top: 372rpx;
-    left: 286rpx;
-    transform: rotate(-60deg);
-  }
-  80% {
-    top: 291rpx;
-    left: 339rpx;
-    transform: rotate(90deg);
-  }
-  90% {
-    top: 353rpx;
-    left: 231rpx;
-    transform: rotate(60deg);
-  }
-  100% {
-    top: 360rpx;
-    left: 340rpx;
-    transform: rotate(0deg);
-  }
-}
 </style>

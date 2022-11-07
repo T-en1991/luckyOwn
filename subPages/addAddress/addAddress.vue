@@ -1,15 +1,10 @@
 <template>
 	<view class="address">
-<!--		<view class="address_head flex">-->
-<!--			<image src="https://static.gute.fun/static/luckyOwn/image/publice/fanhui@2x.png" mode="" @click="retutnTop"></image>-->
-<!--			<text>{{ type == 0 ? '添加收货地址' : '修改收货地址' }}</text>-->
-<!--			<image :src="type== 0 ? '' : 'https://static.gute.fun/static/luckyOwn/image/me/shanchu@2x.png' " mode="" @click="delAddress"></image>-->
-<!--		</view>-->
 		<view class="address_ul">
 			<view class="address_li">
 				<view class="address_name">收货人</view>
 				<view class="address_ipt flex">
-					<input type="text" maxlength="10" v-model="user.username" placeholder="请输入收货人姓名" placeholder-style="color:#999999" />
+					<input type="text" v-model="user.username" placeholder="请输入收货人姓名" placeholder-style="color:#999999" />
 				</view>
 			</view>
 			<view class="address_li">

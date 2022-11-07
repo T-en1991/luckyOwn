@@ -8,7 +8,7 @@
     <view class="me_main">
       <view class="me_main_head">
         <!-- 用户 -->
-        <view class="me_head flexs" @click="goSet">
+        <view class="me_head flexs" @click="getOpenId">
           <view class="txbj">
             <image :src="info.avatar" mode="aspectFill"></image>
           </view>
@@ -31,7 +31,7 @@
               <image src="https://static.gute.fun/static/luckyOwn/publice/jinruer@2x.png"></image>
             </view>
           </view>
-          <view class="me_main_head_ul flex">
+          <view class="me_main_head_ul" style="display: flex;justify-content: space-evenly;align-items: center">
             <view class="me_main_head_li center" v-for="(item,index) in orderList" :key="index" @click="order(index)">
               <image :src="item.image"></image>
               <text>{{ item.name }}</text>
@@ -41,7 +41,7 @@
       </view>
       <view class="me_main_con">
         <view class="me_main_con_head">钱包
-          <view class="txmx" @click="txmx">提现明细>></view>
+          <view class="txmx" @click="txmx">提现>></view>
         </view>
 
         <view class="me_main_con_gold flex">
@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import apiMy from '../../http/apiMy'
 export default {
   data() {
     return {
@@ -91,23 +92,19 @@ export default {
       orderList: [
         {
           image: 'https://static.gute.fun/static/luckyOwn/me/daifahuo@2x.png',
-          name: '待发货'
+          name: '已申请'
         },
         {
           image: 'https://static.gute.fun/static/luckyOwn/me/yifahuo@2x.png',
           name: '已发货'
-        },
-        {
-          image: 'https://static.gute.fun/static/luckyOwn/me/succed.png',
-          name: '已完成'
         }
       ],
       footerList: [
-        {
-          image: 'https://static.gute.fun/static/luckyOwn/me/hegui@2x.png',
-          name: '我的盒柜',
-          url: '/subPages/myBox/myBox'
-        },
+        // {
+        //   image: 'https://static.gute.fun/static/luckyOwn/me/hegui@2x.png',
+        //   name: '我的盒柜',
+        //   url: '/subPages/myBox/myBox'
+        // },
         {
           image: 'https://static.gute.fun/static/luckyOwn/me/jilu.png',
           name: '开箱记录',
@@ -139,6 +136,11 @@ export default {
           url: '/subPages/myAddress/myAddress'
         },
         {
+          image: 'https://static.gute.fun/static/luckyOwn/me/hegui@2x.png',
+          name: '收钱账号',
+          url: '/subPages/collectMoney/collectMoney'
+        },
+        {
           image: 'https://static.gute.fun/static/luckyOwn/me/kf1.png',
           name: '联系客服',
           url: '/subPages/contactService/contactService'
@@ -153,6 +155,34 @@ export default {
     };
   },
   methods: {
+    getOpenId(){
+      uni.getUserProfile({
+        desc: '登录后可同步数据',
+        lang: 'zh_CN',
+        success: (res) => {
+          this.nickname = res.userInfo.nickName
+          this.avatar = res.userInfo.avatarUrl
+          //再调用uni.login,获取code,只有获取code才能获取openid
+          uni.login({
+            provider: 'weixin',
+            success: (res) => {
+              //先等到code，然后才能获取openid
+
+              this.code = res.code;
+              console.log("appid", this.appid);
+              console.log("secret", this.secret);
+
+              apiMy.login( {
+                code: this.code,
+              }).then( res => {
+                console.log(121)
+                console.log(res);
+              });
+            },
+          })
+        },
+      });
+    },
     goSet() {
       uni.navigateTo({url: '/subPages/setting/setting'})
     },

@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/my/my",
     "pages/showPic/showPic",
-    "pages/login/login"
+    "pages/dynamic/dynamic",
+    "pages/box/box"
   ],
   "subPackages": [
     {
@@ -20,7 +21,10 @@
         "contactService/contactService",
         "myWallet/myWallet",
         "rechargeCenter/rechargeCenter",
-        "addAddress/addAddress"
+        "addAddress/addAddress",
+        "goodsDetail/goodsDetail",
+        "collectMoney/collectMoney",
+        "addCollectMoney/addCollectMoney"
       ],
       "name": "subPages"
     }
@@ -43,10 +47,22 @@
         "text": "首页"
       },
       {
+        "pagePath": "pages/dynamic/dynamic",
+        "iconPath": "static/image/tabbar/sxdt.png",
+        "selectedIconPath": "static/image/tabbar/sxdt_checked.png",
+        "text": "上新动态"
+      },
+      {
         "pagePath": "pages/showPic/showPic",
         "iconPath": "static/image/tabbar/fenleiweixuanzhong@2x.png",
         "selectedIconPath": "static/image/tabbar/fenleixuanzhong@2x.png",
         "text": "晒图"
+      },
+      {
+        "pagePath": "pages/box/box",
+        "iconPath": "static/image/tabbar/box.png",
+        "selectedIconPath": "static/image/tabbar/box_checked.png",
+        "text": "盒柜"
       },
       {
         "pagePath": "pages/my/my",

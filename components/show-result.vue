@@ -4,7 +4,7 @@
 			<view :class="['prize', explode && 'show']">
 				<view class="prize_box">
 					<view class="prize_close" @click="close()">
-						<image src="/static/image/home/guanbi@2x.png" mode=""></image>
+						<image src="https://static.gute.fun/static/luckyOwn/home/guanbi@2x.png" mode=""></image>
 					</view>
 <!-- 					<view class="prize-top" :class="`prize-top-${mode}`">
 						<image src="/static/image/result/gaizi@2x.png" mode="aspectFit"></image>
@@ -20,7 +20,7 @@
 						<text class="colorblack" v-if="prizedata&&prizedata.prizeInfo">{{ prizedata.prizeInfo[0].goods_name }}</text>
 					</view>
 					<!-- 5开or10开 -->
-					<view class="prize_ul" :class="`prize_ul-${mode}`" v-else>
+					<view class="prize_ul" :class="`prize_ul`" v-else>
 						<!-- <scroll-view scroll-x="true" class="scroll-view"> -->
 							<view :class="['prize_ul_li', 'twobox', 'flex', 'tag-' + tagFun(item)]" v-for="(item,index) in prizedata.prizeInfo" :key="index">
 								<view class="left-top-tag">
@@ -32,7 +32,7 @@
 							</view>
 						<!-- </scroll-view> -->
 					</view>
-					<view class="prize_footer" :class="`prize_footer-${mode}`" v-if="type == 0">
+					<view class="prize_footer" :class="`prize_footer}`" v-if="type == 0">
 						<!-- 立即收下 -->
 						<view class="btn btn-1" @click="$emit('accept')">立即收下</view>
 						<!-- 一键回收 -->
@@ -44,10 +44,10 @@
 			<view v-show="!hide" class="loading-mask">
 				<view :animation="boxAnimation" :class="['animation-wrapper', explode && 'explode']">
 					<image :src="boxImg" mode="heightFix" class="box"></image>
-					<image src="@/static/image/result/halo.png" mode="heightFix" class="halo"></image>
+					<image src="https://static.gute.fun/static/luckyOwn/result/halo.png" mode="heightFix" class="halo"></image>
 				</view>
 			</view>
-			<audio id="result-audio" src="@/static/image/result/1.mp3"></audio>
+			<audio id="result-audio" src="https://static.gute.fun/static/luckyOwn/result/1.mp3"></audio>
 		</view>
 	</uni-popup>
 </template>
@@ -74,7 +74,7 @@
 				scale: false,
 				//开盒动画
 				openLoading: true,
-				boxImg: require('@/static/image/result/box.png'),
+				boxImg: 'https://static.gute.fun/static/luckyOwn/result/box.png',
 				//动画
 				boxAnimation: {},
 				animationTime: 100,
@@ -117,6 +117,7 @@
 			}
 		},
 		methods: {
+
 			open (prizedata) {
 				prizedata.boxImg && (this.boxImg = prizedata.boxImg)
 				//播放音乐
@@ -194,16 +195,16 @@
 			tagImgFun(prizeInfo){
 				if(!prizeInfo) return null
 				if(prizeInfo.tag == 'normal'){
-					return "/pagesA/static/tag-1.png"
+					return "https://static.gute.fun/static/luckyOwn/pagesA/static/tag-1.png"
 				}
 				if(prizeInfo.tag == 'rare'){
-					return "/pagesA/static/tag-2.png"
+					return "https://static.gute.fun/static/luckyOwn/pagesA/static/tag-2.png"
 				}
 				if(prizeInfo.tag == 'supreme'){
-					return "/pagesA/static/tag-3.png"
+					return "https://static.gute.fun/static/luckyOwn/pagesA/static/tag-3.png"
 				}
 				if(prizeInfo.tag == 'legend'){
-					return "/pagesA/static/tag-4.png"
+					return "https://static.gute.fun/static/luckyOwn/pagesA/static/tag-4.png"
 				}
 			},
 			recycle(){
@@ -267,7 +268,7 @@
 .result-popup-main{
 	z-index: 9999;
 	.result-popup{
-		background-image: url('@/static/image/result/bg.jpg');
+		background-image: url('https://static.gute.fun/static/luckyOwn/result/bg.jpg');
 		position: fixed;
 		bottom: 0;
 		left: 0;
@@ -292,7 +293,7 @@
 		height: 1120rpx;
 		position: relative;
 		flex-direction: column;
-		background: url(/static/image/result/guang@2x.png) no-repeat;
+		background: url(https://static.gute.fun/static/luckyOwn/result/guang@2x.png) no-repeat;
 		background-size: 100% auto;
 		background-position: top;
 		background-repeat: no-repeat;
@@ -350,7 +351,7 @@
     }
 	}
 	.shiwan {
-		background: url(/static/image/open/tanchuangbeijing@2x.png) no-repeat;
+		background: url(https://static.gute.fun/static/luckyOwn/open/tanchuangbeijing@2x.png) no-repeat;
 		background-size: cover;
 	}
 	.prize_ul{
@@ -386,7 +387,7 @@
 			padding: 8rpx 0;
 			// margin-right: 20rpx;
 			box-sizing: border-box;
-			
+
 			image {
 				margin: 0 auto;
 			}
@@ -418,7 +419,7 @@
 			z-index: -1;
 			height: 150vh;
 			width: 150vh;
-			background-image: url('@/static/image/result/spining.png');
+			background-image: url('https://static.gute.fun/static/luckyOwn/result/spining.png');
 			background-repeat: no-repeat;
 			background-size: 100% 100%;
 			position: absolute;
@@ -535,7 +536,7 @@
     from{transform: rotate(0deg)}
 	to{transform: rotate(360deg)}
 }
- 
+
 .spining{
     transition: 0.3s;
     animation: rotate 10s linear infinite;  /*开始动画后无限循环，用来控制rotate*/

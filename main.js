@@ -4,6 +4,7 @@ import api from 'http/api.js'
 
 // #ifndef VUE3
 import Vue from 'vue'
+
 Vue.config.productionTip = false
 App.mpType = 'app'
 

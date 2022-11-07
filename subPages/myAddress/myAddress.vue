@@ -40,7 +40,7 @@ export default {
     //编辑地址
     editAddress (item) {
       uni.setStorageSync('editAddress',JSON.stringify(item))
-      uni.navigateTo({url:'/pages/me/addSite?type=1'})
+      uni.navigateTo({url:'/subPages/addAddress/addAddress?type=1'})
     },
     //选择地址
     selectAddress (item) {
