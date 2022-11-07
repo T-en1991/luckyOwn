@@ -27,8 +27,8 @@
 //小球随机滚动
 @keyframes around1 {
   10% {
-    top: 310rpx;
-    left: 120rpx;
+    top: 340rpx;
+    left: 264rpx;
     transform: rotate(-40deg);
   }
   20% {
@@ -72,8 +72,8 @@
     transform: rotate(-50deg);
   }
   100% {
-    top: 370rpx;
-    left: 200rpx;
+    top: 340rpx;
+    left: 264rpx;
     transform: rotate(0deg);
   }
 }

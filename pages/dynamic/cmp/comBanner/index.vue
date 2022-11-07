@@ -1,12 +1,11 @@
 <template>
   <view class="comBanner">
-    <u-swiper
-      :list="list3"
-      height="200"
-      indicatorMode="line"
-      circular
-    ></u-swiper>
-<!--    <view class="rectangle"></view>-->
+    <swiper class="swiper" circular :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval"
+            :duration="duration">
+      <swiper-item v-for="(item,index) in list3">
+        <image :src="item" width="100%" mode="widthFix"></image>
+      </swiper-item>
+    </swiper>
   </view>
 </template>
 
@@ -16,8 +15,7 @@ export default {
   data() {
     return {
       list3: [
-        'https://blogserve.gute.fun/statics/luckly/banner1.png',
-        'https://blogserve.gute.fun/statics/luckly/banner2.png',
+        `https://static.gute.fun/static/luckyOwn/lucky/dBanner.png`
       ],
     }
   },

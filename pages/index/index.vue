@@ -513,7 +513,6 @@ export default {
     .showAnimate {
       animation: show 1s 1;
     }
-
   }
 
   .content {
@@ -577,8 +576,8 @@ export default {
           transform: rotate(0deg);
 
           &.one {
-            top: 370rpx;
-            left: 200rpx;
+            top: 340rpx;
+            left: 264rpx;
           }
 
           &.two {
@@ -773,8 +772,8 @@ export default {
 
       .shou {
         position: absolute;
-        top: -20rpx;
-        right: -180rpx;
+        top: 10rpx;
+        right: -140rpx;
         display: flex;
         align-items: center;
         animation: shouAnimation 1000ms linear forwards infinite;
@@ -804,7 +803,6 @@ export default {
   }
 
   .footer {
-    margin-bottom: 100rpx;
 
     .swiperBlock {
       position: relative;

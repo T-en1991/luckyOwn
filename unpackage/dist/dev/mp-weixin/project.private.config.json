@@ -30,6 +30,20 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "1111",
+          "pathName": "subPages/goodsDetail/goodsDetail",
+          "query": "id=1",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "222",
+          "pathName": "pages/dynamic/dynamic",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

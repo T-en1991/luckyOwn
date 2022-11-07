@@ -23,17 +23,11 @@ export default {
 
 <style lang="scss" scoped>
 .goodCard {
-  position: relative;
-  top: 0;
-  left: 0;
-  padding: 10rpx 20rpx;
+  padding: 20rpx;
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, .1);
-
+  background-color: #fff;
+  border-radius: 10px;
   .level {
-    position: absolute;
-    top: -20rpx;
-    left: -20rpx;
 
     image {
       width: 64rpx;
@@ -56,7 +50,9 @@ export default {
     .block_content {
       margin-left: 10rpx;
       .content {
-        line-height: 36rpx;
+        font-size: 28rpx;
+        font-weight: bold;
+        line-height: 40rpx;
       }
 
       .price {
